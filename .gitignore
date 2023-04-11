@@ -28,6 +28,10 @@ share/python-wheels/
 MANIFEST
 
 
+#mac
+.DS_Store
+data/
+
 # dotenv file
 .env
 
