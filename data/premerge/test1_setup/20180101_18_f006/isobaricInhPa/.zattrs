@@ -1,0 +1,8 @@
+{
+    "_ARRAY_DIMENSIONS": [],
+    "long_name": "pressure",
+    "positive": "down",
+    "standard_name": "air_pressure",
+    "stored_direction": "decreasing",
+    "units": "hPa"
+}
