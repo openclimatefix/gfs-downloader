@@ -305,7 +305,7 @@ class UcarDownload:
 
         while date < end_date:
             # XXX increase forcast to 3 - 72, do ending 73 as inclusive
-            for fc in list(3,6,9,12,18,24,36,48,60,72):
+            for fc in (3,6,9,12,18,24,36,48,60,72):
                 url = build_url(date, fc)
                 try:
                     file = Path(download_file(url, cookies=self.cookies))
