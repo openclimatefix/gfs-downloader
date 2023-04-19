@@ -156,7 +156,7 @@ def create_ds(path: Path) -> xr.Dataset:
         engine="cfgrib",
         backend_kwargs={
             "filter_by_keys": {
-                "cfVarName": "unknown",
+                "cfVarName": "lcc",
                 "typeOfLevel": "lowCloudLayer",
                 "stepType": "instant"
             }
