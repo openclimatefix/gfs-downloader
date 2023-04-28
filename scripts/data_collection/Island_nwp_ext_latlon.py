@@ -202,7 +202,7 @@ def extract_latlong(
 
     #Reverse lat_max lat_min as latitude goes from highest to lowest!
     it = ds.sel(latitude=slice(lat_max, lat_min), longitude=slice(long_min, long_max)).chunk(
-        dict(step=2, time=1000, latitude=9, longitude=9)
+        dict(latitude=9, longitude=9)
     )
     #Chunking size should be related to the breakdown of data in that dimension
     #Leave out time unless you know the exact number of dates. 
