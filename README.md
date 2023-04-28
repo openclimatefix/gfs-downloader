@@ -11,6 +11,14 @@ UCAR_EMAIL = "INSERT_EMAIL"
 UCAR_PASS = "INESERT_PASSWORD"
 ```
 
+### Setting up the environment
+
+```
+Requirements.txt
+```
+
+Add others (dask, etc...)
+
 ### Download Operation
 
 To see download script inputs: `poetry run Island_nwp_ext_latlon.py --help`
@@ -28,17 +36,17 @@ python Island_nwp_ext_latlon.py Start_Date End_Date Output_Path LATMIN LATMAX LO
 Date format YYYY-MM-DD
 
 
-To keep operation running in the background use nohop (a nohop.out file will be created to keep a log):
+To keep operation running in the background use nohup (a nohup.out file will be created to keep a log):
 
 ```
-nohop python Island_nwp_ext_latlon.py Start_Date End_Date Output_Path LATMIN LATMAX LONGMIN LONGMAX &
+nohup python Island_nwp_ext_latlon.py Start_Date End_Date Output_Path LATMIN LATMAX LONGMIN LONGMAX &
 ```
 
 
 Set the location of the output log, this example will create the nwp_run_v1.log at the location where the command was executed:
 
 ```
-nohop python Island_nwp_ext_latlon.py Start_Date End_Date Output_Path LATMIN LATMAX LONGMIN LONGMAX >> nwp_run_v1.log 2>&1 &
+nohup python Island_nwp_ext_latlon.py Start_Date End_Date Output_Path LATMIN LATMAX LONGMIN LONGMAX >> nwp_run_v1.log 2>&1 &
 ```
 
 
