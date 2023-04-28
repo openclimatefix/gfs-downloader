@@ -85,7 +85,6 @@ def create_ds(path: Path) -> xr.Dataset:
             "filter_by_keys": {
                 "cfVarName": "unknown",
                 "typeOfLevel": "middleCloudLayer",
-                "stepType": "instant",
             }
         },
     )
@@ -99,7 +98,6 @@ def create_ds(path: Path) -> xr.Dataset:
             "filter_by_keys": {
                 "cfVarName": "unknown",
                 "typeOfLevel": "highCloudLayer",
-                "stepType": "instant",
             }
         },
     )
@@ -113,7 +111,6 @@ def create_ds(path: Path) -> xr.Dataset:
             "filter_by_keys": {
                 "cfVarName": "unknown",
                 "typeOfLevel": "lowCloudLayer",
-                "stepType": "instant"
             }
         },
     )
