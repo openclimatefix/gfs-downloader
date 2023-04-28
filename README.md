@@ -101,8 +101,10 @@ echo "$date_chunks"
 
 Run this to create Num_Parallel tasks (Google Cloud Computing has a max of 10), stored at location Output_Path/task_{Number corresponding to execution order}.
 
+Adjust depending on your file structure
+
 The {1} and {2} load in the start and end date of the script.
 
 ```
-echo "$date_chunks" | nohup parallel -j Num_Parallel --colsep ' ' 'python //home/zak/gfs-downloader/scripts/data_collection/Island_nwp_ext_latlon.py {1} {2} //Output_Path/task_{#} LATMIN LATMAX LONGMIN LONGMAX' >> nwp_run_p1.log 2>&1 &
+echo "$date_chunks" | nohup parallel -j Num_Parallel --colsep ' ' 'python //gfs-downloader/scripts/data_collection/Island_nwp_ext_latlon.py {1} {2} //Output_Path/task_{#} LATMIN LATMAX LONGMIN LONGMAX' >> nwp_run_p1.log 2>&1 &
 ```
