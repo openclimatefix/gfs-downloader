@@ -153,7 +153,7 @@ def create_ds(path: Path) -> xr.Dataset:
             ds_lcl,
             ds_cfrzr,
         ],
-        #shouldn't need override on
+        # any non-matching coordinates or dimensions in the input arrays will be dropped with compat="override"
         compat="override",
     )
 
@@ -200,17 +200,12 @@ def extract_latlong(
     ds: xr.Dataset, lat_min: float, lat_max: float, long_min: float, long_max: float
 ) -> None:
 
+    #Reverse lat_max lat_min as latitude goes from highest to lowest!
     it = ds.sel(latitude=slice(lat_max, lat_min), longitude=slice(long_min, long_max)).chunk(
         dict(step=2, time=1000, latitude=9, longitude=9)
     )
-    # longitude=slice(long_min, long_max)
-    # This just determines the size of the chunkingin each stage of the code.
-    # dict(latitude=49, longitude=53)
-
+    #Chunking size should be related to the breakdown of data in that dimension
     return it
-
-
-# latitude goes from highest to lowest!
 
 
 class UcarDownload:
@@ -244,7 +239,7 @@ class UcarDownload:
         delta = timedelta(hours=6)
 
         while date < end_date:
-            # XXX increase forcast to 3 - 72, do ending 73 as inclusive
+            # to increase forcast add script or (3,6,9,12,...)
             for fc in (3,6):
                 url = build_url(date, fc)
                 try:
@@ -286,17 +281,6 @@ def main(
         print(f"Saved zarr to 'dest/{fname}'")
         path.unlink()
 
-
-# poetry run psp/data_collection/IslandPV_NWPv2.py --help
-# poetry run psp/data_collection/IslandPV_NWPv2.py START END DEST LATMIN LATMAX LONGMIN LONGMAX
-
-# For Island A specifically:     13 15 35 37
-
-# poetry run psp/data_collection/IslandPV_NWPv2.py 2018-01-01 2018-01-03  LATMIN LATMAX LONGMIN LONGMAX
-
-# /Users/zakwatts/Coding/OCF/pv-site-prediction/data/latlong_filt_pre_merge/Test1
-
-# poetry run python psp/data_collection/IslandPV_NWPv5.py 2018-01-01 2018-01-02 /Users/zakwatts/Coding/OCF/pv-site-prediction/data/latlong_filt_pre_merge/test6 13 15 35 37
 
 if __name__ == "__main__":
     """
