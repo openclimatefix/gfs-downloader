@@ -10,16 +10,10 @@ from tqdm import tqdm
 
 def merge_zarrs(path: Path, out_path: Path) -> None:
     print(f"Merging zarrs from '{path}'")
-    zarrs_f0 = []
-    zarrs_f9 = []
-    zarrs_f12 = []
-    zarrs_f18 = []
-
-    """
     zarrs_f3 = []
     zarrs_f6 = []
 
-   
+    """"
     zarrs_f9 = []
     zarrs_f12 = []
     zarrs_f18 = []
@@ -43,14 +37,10 @@ def merge_zarrs(path: Path, out_path: Path) -> None:
         # for d in tqdm(sorted(path.iterdir()))::
                         if d.is_dir():
                             ds = xr.open_zarr(d)
-                            if "f000" in d.stem:
-                                zarrs_f0.append(ds)
-                            elif "f009" in d.stem:
-                                zarrs_f9.append(ds)
-                            elif "f012" in d.stem:
-                                zarrs_f12.append(ds)
-                            elif "f018" in d.stem:
-                                zarrs_f18.append(ds)
+                            if "f003" in d.stem:
+                                zarrs_f3.append(ds)
+                            elif "f006" in d.stem:
+                                zarrs_f6.append(ds)
                             """
                             elif "f009" in d.stem:
                                 zarrs_f9.append(ds)
@@ -70,15 +60,11 @@ def merge_zarrs(path: Path, out_path: Path) -> None:
                                 zarrs_f72.append(ds)
                             """
 
-    ds_f0 = xr.concat(zarrs_f0, dim="time")
-    ds_f9 = xr.concat(zarrs_f9, dim="time")
-    ds_f12 = xr.concat(zarrs_f12, dim="time")
-    ds_f18 = xr.concat(zarrs_f18, dim="time")    
+    
 
-    """"
     ds_f3 = xr.concat(zarrs_f3, dim="time")
     ds_f6 = xr.concat(zarrs_f6, dim="time")
-    
+    """"
     ds_f9 = xr.concat(zarrs_f9, dim="time")
     ds_f12 = xr.concat(zarrs_f12, dim="time")
     ds_f18 = xr.concat(zarrs_f18, dim="time")
@@ -91,7 +77,7 @@ def merge_zarrs(path: Path, out_path: Path) -> None:
     
 
     ds_out = xr.concat(
-        [ds_f0, ds_f9, ds_f12, ds_18], dim="step" #ds_f9, ds_f12, ds_f18, ds_f24, ds_f36, ds_f48, ds_f60, ds_f72], dim="step"
+        [ds_f3, ds_f6], dim="step" #ds_f9, ds_f12, ds_f18, ds_f24, ds_f36, ds_f48, ds_f60, ds_f72], dim="step"
     )  # ds_f15, ds_f18, ds_f21, ds_f24 ], dim="step")
     print(f"Saving single zarr to '{out_path}'")
     ds_out.to_zarr(
