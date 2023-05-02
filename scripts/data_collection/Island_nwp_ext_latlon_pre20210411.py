@@ -238,7 +238,7 @@ class UcarDownload:
 
         while date < end_date:
             # to increase forcast add script or (3,6,9,12,...)
-            for fc in (3,6):
+            for fc in (0,9,12,18):
                 url = build_url(date, fc)
                 try:
                     file = Path(download_file(url, cookies=self.cookies))
