@@ -69,7 +69,7 @@ def create_ds(path: Path) -> xr.Dataset:
         engine="cfgrib",
         backend_kwargs={"filter_by_keys": {"typeOfLevel": "surface", "stepType": "avg"}},
     )
-    ds_d = ds_dp.dlwrf
+    # ds_d = ds_dp.dlwrf
     # Total percipitation
     ds_p = ds_dp.prate
     ds_dswrf = ds_dp.dswrf
