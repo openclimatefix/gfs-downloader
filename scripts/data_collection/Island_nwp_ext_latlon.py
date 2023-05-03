@@ -16,6 +16,7 @@ from typing import Optional
 
 import httpx
 import typer
+from typing import List, Sequence
 import xarray as xr
 from dotenv import load_dotenv
 from tqdm import tqdm
@@ -27,7 +28,7 @@ import cfgrib
 load_dotenv()
 
 
-def create_ds(path: Path) -> xr.Dataset:
+def create_ds(path: Path, date: datetime, fc: int) -> xr.Dataset:
     """
     create_ds function: Create an xarray Dataset
     from a GRIB file using the cfgrib engine.
@@ -69,56 +70,110 @@ def create_ds(path: Path) -> xr.Dataset:
         engine="cfgrib",
         backend_kwargs={"filter_by_keys": {"typeOfLevel": "surface", "stepType": "avg"}},
     )
-    ds_d = ds_dp.dlwrf
-    # Total percipitation
-    ds_p = ds_dp.prate
-    ds_dswrf = ds_dp.dswrf
+    
+    if fc > 0:
+        ds_d = ds_dp.dlwrf
+        # Total percipitation
+        ds_p = ds_dp.prate
+        ds_dswrf = ds_dp.dswrf
 
-    # Categorical freezing rain
-    ds_cfrzr = ds_dp.cfrzr
+        # Categorical freezing rain
+        ds_cfrzr = ds_dp.cfrzr
 
-    # Need to also import Total Cloud Cover for each layer
-    ds_mcl = xr.open_dataset(
-        path,
-        engine="cfgrib",
-        backend_kwargs={
-            "filter_by_keys": {
-                "cfVarName": "mcc",
-                "typeOfLevel": "middleCloudLayer",
-                "stepType": "instant",
-            }
-        },
-    )
-    #tcc to mcc
-    ds_mcl = ds_mcl.rename({"mcc": "tcc_middle"})
+    
+    else:
+        print("forecast is 0, no dlwrf,prate,dswrf,cfrzr - continuing")
+        
 
-    ds_hcl = xr.open_dataset(
-        path,
-        engine="cfgrib",
-        backend_kwargs={
-            "filter_by_keys": {
-                "cfVarName": "hcc",
-                "typeOfLevel": "highCloudLayer",
-                "stepType": "instant",
-            }
-        },
-    )
-    #tcc to hcc
-    ds_hcl = ds_hcl.rename({"hcc": "tcc_high"})
+    if date > datetime(2021,3,22):
 
-    ds_lcl = xr.open_dataset(
-        path,
-        engine="cfgrib",
-        backend_kwargs={
-            "filter_by_keys": {
-                "cfVarName": "lcc",
-                "typeOfLevel": "lowCloudLayer",
-                "stepType": "instant"
-            }
-        },
-    )
-    ds_lcl = ds_lcl.rename({"lcc": "tcc_low"})
+        
+        # Need to also import Total Cloud Cover for each layer
+        ds_mcl = xr.open_dataset(
+            path,
+            engine="cfgrib",
+            backend_kwargs={
+                "filter_by_keys": {
+                    "cfVarName": "mcc",
+                    "typeOfLevel": "middleCloudLayer",
+                    "stepType": "instant",
+                }
+            },
+        )
+        #tcc to mcc
+        ds_mcl = ds_mcl.rename({"mcc": "tcc_middle"})
 
+        ds_hcl = xr.open_dataset(
+            path,
+            engine="cfgrib",
+            backend_kwargs={
+                "filter_by_keys": {
+                    "cfVarName": "hcc",
+                    "typeOfLevel": "highCloudLayer",
+                    "stepType": "instant",
+                }
+            },
+        )
+        #tcc to hcc
+        ds_hcl = ds_hcl.rename({"hcc": "tcc_high"})
+
+        ds_lcl = xr.open_dataset(
+            path,
+            engine="cfgrib",
+            backend_kwargs={
+                "filter_by_keys": {
+                    "cfVarName": "lcc",
+                    "typeOfLevel": "lowCloudLayer",
+                    "stepType": "instant"
+                }
+            },
+        )
+        ds_lcl = ds_lcl.rename({"lcc": "tcc_low"})
+
+    elif date <= datetime(2022,3,22) and fc != 0:
+        # Need to also import Total Cloud Cover for each layer
+        ds_mcl = xr.open_dataset(
+            path,
+            engine="cfgrib",
+            backend_kwargs={
+                "filter_by_keys": {
+                    "cfVarName": "unknown",
+                    "typeOfLevel": "middleCloudLayer",
+                }
+            },
+        )
+        #tcc to mcc
+        ds_mcl = ds_mcl.rename({"tcc": "tcc_middle"})
+    
+        ds_hcl = xr.open_dataset(
+            path,
+            engine="cfgrib",
+            backend_kwargs={
+                "filter_by_keys": {
+                    "cfVarName": "unknown",
+                    "typeOfLevel": "highCloudLayer",
+                }
+            },
+        )
+        #tcc to hcc
+        ds_hcl = ds_hcl.rename({"tcc": "tcc_high"})
+
+        ds_lcl = xr.open_dataset(
+            path,
+            engine="cfgrib",
+            backend_kwargs={
+                "filter_by_keys": {
+                    "cfVarName": "unknown",
+                    "typeOfLevel": "lowCloudLayer",
+                }
+            },
+        )
+        ds_lcl = ds_lcl.rename({"tcc": "tcc_low"})
+    
+    else:
+        print("Invalid date or fc=0")
+    
+    
     ds_v = xr.open_dataset(
         path,
         engine="cfgrib",
@@ -128,6 +183,7 @@ def create_ds(path: Path) -> xr.Dataset:
         },
     )
     ds_v = ds_v.isel(isobaricInhPa=0).v
+
 
     ds_u = xr.open_dataset(
         path,
@@ -139,23 +195,42 @@ def create_ds(path: Path) -> xr.Dataset:
     )
     ds_u = ds_u.isel(isobaricInhPa=0).u
 
-    ds_merged = xr.merge(
-        [
-            ds_t,
-            ds_u,
-            ds_v,
-            ds_d,
-            ds_p,
-            ds_dswrf,
-            ds_hum,
-            ds_mcl,
-            ds_hcl,
-            ds_lcl,
-            ds_cfrzr,
-        ],
-        # any non-matching coordinates or dimensions in the input arrays will be dropped with compat="override"
-        compat="override",
-    )
+    if fc > 0:
+        ds_merged = xr.merge(
+            [
+                ds_t,
+                ds_u,
+                ds_v,
+                ds_d,
+                ds_p,
+                ds_dswrf,
+                ds_hum,
+                ds_mcl,
+                ds_hcl,
+                ds_lcl,
+                ds_cfrzr,
+            ],
+            # any non-matching coordinates or dimensions in the input arrays will be dropped with compat="override"
+            #Fine for different variables for the 0 fc and greater than 0 case.
+            compat="override",
+        )
+    elif fc == 0:
+        ds_merged = xr.merge(
+            [
+                ds_t,
+                ds_u,
+                ds_v,
+                ds_hum,
+                # ds_mcl,
+                # ds_hcl,
+                # ds_lcl,
+            ],
+            # any non-matching coordinates or dimensions in the input arrays will be dropped with compat="override"
+            compat="override",
+        )
+    else:
+        print("Invalid forecast")
+
 
     print(path)
 
@@ -234,14 +309,14 @@ class UcarDownload:
         return res.cookies
 
     def download_range(
-        self, start_date: datetime, end_date: datetime
+        self, start_date: datetime, end_date: datetime, steps: List[int]
     ) -> Iterable[tuple[datetime, int, Path]]:
         date = start_date
         delta = timedelta(hours=6)
 
         while date < end_date:
             # to increase forcast add script or (3,6,9,12,...)
-            for fc in (0):
+            for fc in steps:
                 url = build_url(date, fc)
                 try:
                     file = Path(download_file(url, cookies=self.cookies))
@@ -249,6 +324,7 @@ class UcarDownload:
                 except KeyError as e:
                     print(f"Failed for {date=}, {fc=} with {e}")
             date += delta
+
 
 
 def main(
@@ -259,6 +335,7 @@ def main(
     lat_max: float,
     long_min: float,
     long_max: float,
+    steps: str = typer.Option("", help="List of steps"), # = typer.Option("3,6", help="Forecast hours steps to download", callback=parse_steps),  # Modify the steps argument)
 ) -> None:
     """
     main function: Set up the UcarDownload instance and download the
@@ -267,20 +344,34 @@ def main(
     and save it as a zarr file in the destination directory. Finally, delete
     the temporary downloaded file.
     """
+    steps_list = [int(step.strip()) for step in steps.split(",")] if steps else []
+    missing_dates_info = []
+
 
     downloader = UcarDownload()
-    files = downloader.download_range(start_date, end_date)
+    files = downloader.download_range(start_date, end_date, steps_list)
     for date, fc, path in files:
-        print(path)
-        ds = create_ds(path)
 
-        it = extract_latlong(ds, lat_min, lat_max, long_min, long_max)
+        try:
+            print(path)
+            ds = create_ds(path, date, fc)
+            it = extract_latlong(ds, lat_min, lat_max, long_min, long_max)
+        except:
+            print(f"An error occurred while processing data for {date}, and path{path}")
+            missing_dates_info.append((date, fc, path))
+            continue
+
 
         ymdh = date.strftime("%Y%m%d_%H")
         fname = f"{ymdh}_f{fc:03d}"
         it.to_zarr(dest_dir / fname, mode="w")
         print(f"Saved zarr to 'dest/{fname}'")
         path.unlink()
+    
+        # Print the missing dates information at the end
+    print("\nMissing Dates Information:")
+    for missing_date, missing_fc, missing_path in missing_dates_info:
+        print(f"Date: {missing_date}, Forecast Hour: {missing_fc}, Path: {missing_path}")
 
 
 if __name__ == "__main__":
