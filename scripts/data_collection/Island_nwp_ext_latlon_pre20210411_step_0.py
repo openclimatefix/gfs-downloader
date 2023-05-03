@@ -238,14 +238,15 @@ class UcarDownload:
 
         while date < end_date:
             # to increase forcast add script or (3,6,9,12,...)
-            for fc in (9,12,18):
-                url = build_url(date, fc)
-                try:
-                    file = Path(download_file(url, cookies=self.cookies))
-                    yield date, fc, file
-                except KeyError as e:
-                    print(f"Failed for {date=}, {fc=} with {e}")
-            date += delta
+            # for fc in (9,12,18):
+            fc = 0
+            url = build_url(date, fc)
+            try:
+                file = Path(download_file(url, cookies=self.cookies))
+                yield date, fc, file
+            except KeyError as e:
+                print(f"Failed for {date=}, {fc=} with {e}")
+        date += delta
 
 
 def main(
