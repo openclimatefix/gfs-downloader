@@ -75,7 +75,7 @@ def create_ds(path: Path) -> xr.Dataset:
     # ds_dswrf = ds_dp.dswrf
 
     # Categorical freezing rain
-    ds_cfrzr = ds_dp.cfrzr
+    # ds_cfrzr = ds_dp.cfrzr
 
     # Need to also import Total Cloud Cover for each layer
     ds_mcl = xr.open_dataset(
@@ -151,7 +151,7 @@ def create_ds(path: Path) -> xr.Dataset:
             ds_mcl,
             ds_hcl,
             ds_lcl,
-            ds_cfrzr,
+            # ds_cfrzr,
         ],
         # any non-matching coordinates or dimensions in the input arrays will be dropped with compat="override"
         compat="override",
