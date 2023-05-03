@@ -16,7 +16,7 @@ from typing import Optional
 
 import httpx
 import typer
-from typing import List, Sequence
+from typing import List
 import xarray as xr
 from dotenv import load_dotenv
 from tqdm import tqdm
