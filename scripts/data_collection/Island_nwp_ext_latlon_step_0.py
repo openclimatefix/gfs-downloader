@@ -72,7 +72,7 @@ def create_ds(path: Path) -> xr.Dataset:
     # ds_d = ds_dp.dlwrf
     # Total percipitation
     # ds_p = ds_dp.prate
-    ds_dswrf = ds_dp.dswrf
+    # ds_dswrf = ds_dp.dswrf
 
     # Categorical freezing rain
     ds_cfrzr = ds_dp.cfrzr
@@ -144,9 +144,9 @@ def create_ds(path: Path) -> xr.Dataset:
             ds_t,
             ds_u,
             ds_v,
-            ds_d,
-            ds_p,
-            ds_dswrf,
+            # ds_d,
+            # ds_p,
+            # ds_dswrf,
             ds_hum,
             ds_mcl,
             ds_hcl,
