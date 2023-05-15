@@ -18,15 +18,12 @@ def merge_zarrs(path: Path, out_path: Path, steps: List[int]) -> None:
         if task_folder.is_dir():
             for d in task_folder.glob('*'):
                 if d.is_dir():
-                    print(f"Processing directory: {d}")
-                    print(f"d.stem: {d.stem}")
                     ds = xr.open_zarr(d)
                     match = re.search(r"(\d{8}_\d{2})_f(\d{3})", d.stem)
                     if match:
                         date = match.group(1)
                         step = int(match.group(2))
                         if step in steps:
-                            print(f"Appending dataset from step {step} (date: {date})")
                             zarrs[step].append(ds)
                     else:
                         print(f"No step match found for directory: {d}")
