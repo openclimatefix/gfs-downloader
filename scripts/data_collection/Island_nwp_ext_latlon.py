@@ -71,6 +71,7 @@ def create_ds(path: Path, date: datetime, fc: int) -> xr.Dataset:
         backend_kwargs={"filter_by_keys": {"typeOfLevel": "surface", "stepType": "avg"}},
     )
     
+    #Only certaiin data is available for forecast horizon 0, so we dont collect the follow data variables.
     if fc > 0:
         ds_d = ds_dp.dlwrf
         # Total percipitation
@@ -84,7 +85,7 @@ def create_ds(path: Path, date: datetime, fc: int) -> xr.Dataset:
     else:
         print("forecast is 0, no dlwrf,prate,dswrf,cfrzr - continuing")
         
-
+    #The GFS service used under went an upgrade in 2021-03-22. The format of the cloud cover variables changed as a result of this.
     if date > datetime(2021,3,22):
 
         
@@ -130,6 +131,7 @@ def create_ds(path: Path, date: datetime, fc: int) -> xr.Dataset:
         )
         ds_lcl = ds_lcl.rename({"lcc": "tcc_low"})
 
+     #No cloud cover variables were available beofre the upgrade for the forecast horizon 0. 
     elif date <= datetime(2022,3,22) and fc != 0:
         # Need to also import Total Cloud Cover for each layer
         ds_mcl = xr.open_dataset(
@@ -195,6 +197,7 @@ def create_ds(path: Path, date: datetime, fc: int) -> xr.Dataset:
     )
     ds_u = ds_u.isel(isobaricInhPa=0).u
 
+    
     if fc > 0:
         ds_merged = xr.merge(
             [
@@ -276,11 +279,16 @@ def extract_latlong(
 ) -> None:
 
     #Reverse lat_max lat_min as latitude goes from highest to lowest!
+    #Longitude Range: Westernmost=180W Easternmost=180E
+    #Latitude Range: Southernmost=90S Northernmost=90N
+    
+    #DETAILED COVERAGE INFORMATION0.25° x 0.25° from 0E to 359.75E and 90N to 90S (1440 x 721 Longitude/Latitude)
+    
     it = ds.sel(latitude=slice(lat_max, lat_min), longitude=slice(long_min, long_max)).chunk(
         dict(latitude=9, longitude=9)
     )
     #Chunking size should be related to the breakdown of data in that dimension
-    #Leave out time unless you know the exact number of dates. 
+     
     return it
 
 
@@ -312,6 +320,8 @@ class UcarDownload:
         self, start_date: datetime, end_date: datetime, steps: List[int]
     ) -> Iterable[tuple[datetime, int, Path]]:
         date = start_date
+        
+        #Data is collected every 6 hours as thats when the forecasts are made.
         delta = timedelta(hours=6)
 
         while date < end_date:
@@ -335,7 +345,7 @@ def main(
     lat_max: float,
     long_min: float,
     long_max: float,
-    steps: str = typer.Option("", help="List of steps"), # = typer.Option("3,6", help="Forecast hours steps to download", callback=parse_steps),  # Modify the steps argument)
+    steps: str = typer.Option("", help="List of steps, separated by comma such as 3,6,9,12"),
 ) -> None:
     """
     main function: Set up the UcarDownload instance and download the
