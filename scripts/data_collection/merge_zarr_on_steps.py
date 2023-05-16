@@ -28,6 +28,8 @@ def merge_zarrs(path: Path, out_path: Path, steps: List[int]) -> None:
                     else:
                         print(f"No step match found for directory: {d}")
 
+   
+
     if all(len(zarrs[step]) == 0 for step in steps):
         print("No datasets found for the specified steps.")
         return

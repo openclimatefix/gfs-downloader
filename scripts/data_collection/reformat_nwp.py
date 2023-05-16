@@ -1,7 +1,6 @@
 """
 Once merged, our zarr dataset in in a format where we have one (xarray) *Data variable* per NWP
 variable.
-
 This script put those into a new *Dimension* instead.
 We end up with a 5D tensor with dimensions: (time, step, lat, lon, variable).
 """
@@ -63,3 +62,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
