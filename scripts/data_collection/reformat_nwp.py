@@ -57,9 +57,9 @@ def main():
     # for other use-cases.
     d = d.chunk(dict(time=20))
 
-
     d.to_zarr(args.output)
 
 
 if __name__ == "__main__":
     main()
+

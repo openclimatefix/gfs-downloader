@@ -1,0 +1,13 @@
+altair==4.2.2
+cfgrib==0.9.10.3
+fsspec==2022.11.0
+httpx==0.23.3
+ipython==8.12.0
+ocf_blosc2==0.0.2
+pvlib==0.9.3
+python-dotenv==1.0.0
+scikit_learn==1.2.2
+scipy==1.10.1
+shap==0.41.0
+torchdata==0.5.1
+typer==0.7.0
