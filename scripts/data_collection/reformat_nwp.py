@@ -52,6 +52,10 @@ def main():
     # Turn the xr.DataArray into a xr.Dataset.
     d = xr.Dataset(dict(value=d2))
 
+    #When datesets are merged the steps can be out of order, so we sort them
+    d = d.sortby('step')
+    d = d.sortby('time')
+
     # Chunk the dataset.
     # TODO This chunking is optimized for the "Island" use-case, they should be made customizable
     # for other use-cases.
