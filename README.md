@@ -92,7 +92,7 @@ ps aux | grep Island_nwp_ext_latlon.py
 First instal parallel:
 
 ```
-pip install python-parallel
+conda install parallel
 ```
 
 ##### Generating dates:
