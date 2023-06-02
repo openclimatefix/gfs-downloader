@@ -89,6 +89,12 @@ ps aux | grep Island_nwp_ext_latlon.py
 
 ### Multitasks using parallel:
 
+First instal parallel:
+
+```
+pip install python-parallel
+```
+
 ##### Generating dates:
 
 Use the script `date_generator.py` to generated a "date_chunks" variable.
