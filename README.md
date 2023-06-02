@@ -14,7 +14,13 @@ UCAR_PASS = "INESERT_PASSWORD"
 ### Setting up the environment
 
 ```
-Requirements.txt
+pip install -r requirements.txt
+```
+
+### Instal the ecCodes package
+
+```
+conda install -c conda-forge python-eccodes
 ```
 
 Add others (dask, etc...)
