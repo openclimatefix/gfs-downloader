@@ -6,6 +6,15 @@ Register and make an account here: https://rda.ucar.edu/login/
 
 Create a .env file with this in (make sure to name the file .env and leave it in the root directory):
 
+
+To create a .env file do:
+
+```
+nano .env
+```
+
+Then add your credentials to the file
+
 ```
 UCAR_EMAIL = "INSERT_EMAIL"
 UCAR_PASS = "INESERT_PASSWORD"
