@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
+import time
 import httpx
 import typer
 from typing import List
@@ -240,28 +241,33 @@ def create_ds(path: Path, date: datetime, fc: int) -> xr.Dataset:
     return ds_merged
 
 
-def download_file(
-    url: str,
-    headers: Optional[dict] = None,
-    cookies: Optional[httpx.Cookies] = None,
-) -> str:
+def download_file(url: str, headers: dict = None, cookies: httpx.Cookies = None) -> str:
     """
     download_file function: Download a file from a given URL
     using the httpx library. It streams the file and saves it
     to a temporary location while displaying a progress bar using tqdm.
     """
-
     with tempfile.NamedTemporaryFile(delete=False) as file:
-        with httpx.stream("GET", url, headers=headers, cookies=cookies, timeout=30) as res:
-            total = int(res.headers["Content-Length"])
-            with tqdm(total=total, unit_scale=True, unit_divisor=1024, unit="B") as progress:
-                num_bytes_downloaded = res.num_bytes_downloaded
-                for chunk in res.iter_bytes():
-                    file.write(chunk)
-                    progress.update(res.num_bytes_downloaded - num_bytes_downloaded)
-                    num_bytes_downloaded = res.num_bytes_downloaded
+        num_of_retries = 200
+        retry_wait = 10
+        for i in range(num_of_retries):
+            try:
+                with httpx.stream("GET", url, headers=headers, cookies=cookies, timeout=30) as res:
+                    total = int(res.headers["Content-Length"])
+                    with tqdm(total=total, unit_scale=True, unit_divisor=1024, unit="B") as progress:
+                        num_bytes_downloaded = res.num_bytes_downloaded
+                        for chunk in res.iter_bytes():
+                            file.write(chunk)
+                            progress.update(res.num_bytes_downloaded - num_bytes_downloaded)
+                            num_bytes_downloaded = res.num_bytes_downloaded
+                break
+            except httpx.TimeoutException:
+                if i == num_of_retries - 1:
+                    raise
+                print(f"Timeout, retrying in {retry_wait} seconds...")
+                time.sleep(retry_wait)
+                retry_wait *= 2
     return file.name
-
 
 def build_url(date: datetime, fc: int) -> str:
     """
@@ -312,6 +318,8 @@ class UcarDownload:
             "passwd": os.environ["UCAR_PASS"],
             "action": "login",
         }
+
+        #the auth could also be the point of failure if the servers drops first as well
         res = httpx.post(auth_url, data=auth_data)
         assert res.status_code == 200
         return res.cookies
